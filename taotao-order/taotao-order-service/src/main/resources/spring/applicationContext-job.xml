@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+<!-- 第一套开始 -->	 
+	 <!-- 配置job类 -->
+	 <bean id="orderJob" class="com.taotao.job.OrderJob"></bean>
+	 
+	 <!-- 配置jobDetail -->
+	 <bean id="SpringQtzJobMethod"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="orderJob" />
+		</property>
+		<property name="targetMethod">  <!-- 要执行的方法名称 -->
+			<value>execute</value>
+		</property>
+	</bean>
+	
+	<!-- 配置trigger -->
+	<bean id="cronTriggerFactoryBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean ">
+		<property name="jobDetail" ref="SpringQtzJobMethod"></property>
+		<property name="cronExpression" value="0/1 * * * * ?"></property><!--corn表达式    每一秒执行一次 -->
+	</bean>
+<!-- 第一套结束 -->	 	
+	
+	
+	<!-- 配置调度工厂  配置一份即可 上面的配置 是一套 -->
+	
+	<bean id="SpringJobSchedulerFactoryBean"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="cronTriggerFactoryBean" />
+			</list>
+		</property>
+	</bean>
+	
+</beans>
